@@ -1,0 +1,351 @@
+---
+title: "Subset data for shiny app"
+author: "Ian Hussey^[Ghent University. Email: ian.hussey@ugent.be]"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  html_document:
+    code_folding: hide
+    highlight: haddock
+    theme: flatly
+    toc: yes
+    toc_float: yes
+---
+
+Based on distribution info script.
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(message = FALSE,
+                      warning = FALSE,
+                      cache.lazy = FALSE)
+```
+
+```{r}
+
+# dependencies
+library(tidyverse)
+library(plotrix)
+
+# function to round all numeric columns in a df
+round_df <- function(df, digits) {
+  nums <- vapply(df, is.numeric, FUN.VALUE = logical(1))
+  df[,nums] <- round(df[,nums], digits = digits)
+  (df)
+}
+
+# disable scientific notation
+options(scipen = 999) 
+
+# options
+options(knitr.table.format = "html") # necessary configuration of tables
+
+# get data - not available in this repository
+load("../../AIID-study/data/subsets/attitudes_2.0_subset_exploratory.RData")
+
+```
+
+# Subset 1
+
+```{r}
+
+# trim
+temp_1 <- attitudes_2.0_subset_exploratory %>%
+  select(datetime_ymdhms, 
+         domain, 
+         task_order, 
+         
+         exclude_iat,
+         exclude_iat_stricter,
+         
+         # participant data:
+         age, 
+         sex, 
+         residence, 
+         education, 
+         english_fluency, 
+         ethnicity, 
+         income, 
+         political_identity, 
+         religiosity, 
+
+         # iat data:
+         block_order, 
+         iat_type, 
+         mean_rt, 
+         median_rt, 
+         sd_rt, 
+         perc_accuracy, 
+         D, 
+         G, 
+         A,
+         
+         # self-report attitudes data
+         prefer, 
+         gut_diff, 
+         actual_diff,
+         evaluation_diff, 
+         positive_only_diff, 
+         negative_only_diff, 
+         importance_diff, 
+         think_diff, 
+         certainty_diff, 
+         stability_diff, 
+         identity_diff, 
+         polarity_mean, 
+         
+         others_prefer, 
+         cultural_attitudes_diff, 
+         cultural_pressure_diff, 
+         self_concept_diff, 
+         personal_values_diff, 
+         others_pressure_diff, 
+         
+         # individual differences scales data
+         individual_differences_measure, 
+         individual_differences_sum_score, 
+         BFI_E_subscale, 
+         BFI_C_subscale, 
+         BFI_N_subscale, 
+         BFI_A_subscale, 
+         BFI_O_subscale, 
+         NFCC_P_subscale, 
+         NFCC_D_subscale, 
+         NFCC_C_subscale, 
+         NFCC_O_subscale, 
+         NFCC_A_subscale) %>%
+  rename("IAT D score" = "D",
+         "Self-reported preferences" = "prefer",
+         "Age" = "age",
+         "Date and time" = "datetime_ymdhms",
+         "Implicit/explicit task order" = "task_order",
+         "Age" = "age",
+         "Sex" = "sex",
+         "Education" = "education",
+         "English fluency" = "english_fluency",
+         "Ethnicity" = "ethnicity",
+         "Income" = "income",
+         "Political identity" = "political_identity",
+         "Religiosity" = "religiosity",
+         "IAT block order" = "block_order",
+         "IAT mean reaction time" = "mean_rt",
+         "IAT median reaction time" = "median_rt",
+         "IAT standard deviation of reaction times" = "sd_rt",
+         "IAT percent correct" = "perc_accuracy",
+         "IAT G score" = "G",
+         "IAT A score" = "A",
+         "Gut feelings between categories" = "gut_diff",
+         "Actual feelings between categories" = "actual_diff",
+         "Evaluations between categories" = "evaluation_diff",
+         "Positive evalutions only between categories" = "positive_only_diff",
+         "Negative evaltions only between categories" = "negative_only_diff",
+         "Importance of feelings towards categories between categories" = "importance_diff",
+         "Difference in how often you think about the categories" = "think_diff",
+         "Certainty of feelings between categories" = "certainty_diff",
+         "Stability of feelings between categories" = "stability_diff",
+         "Relevance to identity between categories" = "identity_diff",
+         "Subjective oppositionality between categories" = "polarity_mean",
+         "Other people prefer" = "others_prefer",
+         "Cultural attitudes between categories" = "cultural_attitudes_diff",
+         "Cultural pressure between categories" = "cultural_pressure_diff",
+         "Relevance to self-concept between categories" = "self_concept_diff",
+         "Relevance to personal values between categories" = "personal_values_diff",
+         "Pressure from other people between categories" = "others_pressure_diff",
+         "Big 5 - Openness" = BFI_O_subscale, 
+         "Big 5 - Conscientiousness" = BFI_C_subscale, 
+         "Big 5 - Extroversion" = BFI_E_subscale, 
+         "Big 5 - Agreeableness" = BFI_A_subscale, 
+         "Big 5 - Neuroticism" = BFI_N_subscale,
+         "Need for Cognitive Closure - Predictability" = NFCC_P_subscale, 
+         "Need for Cognitive Closure - Decisiveness" = NFCC_D_subscale, 
+         "Need for Cognitive Closure - Closed-mindedness" = NFCC_C_subscale, 
+         "Need for Cognitive Closure - Order" = NFCC_O_subscale, 
+         "Need for Cognitive Closure - Ambiguity" = NFCC_A_subscale) %>%
+  rownames_to_column()
+
+temp_2 <- temp_1 %>% 
+  select(rowname, individual_differences_measure, individual_differences_sum_score) %>%
+  spread(key = individual_differences_measure, value = individual_differences_sum_score) %>%
+  select(-`BFI-Part 1`, -`BFI-Part 2`, -`NFCC, Part 1`, -`NFCC, Part 2`) %>%
+  rename("Balanced Inventory of Desirable Responding - Impression Management" = "BIDR-IM", 
+         "Balanced Inventory of Desirable Responding - Self Deception" = "BIDR-SDE", 
+         "Belief in a Just World" = "BJW", 
+         "Bayesian Racism" = "BRS", 
+         "Humanitarianism-Egalitarianism" = "HE",
+         "Intuitions about Controllability and Awareness of Thoughts - Others" = "ICAT-O",
+         "Intuitions about Controllability and Awareness of Thoughts - Self" = "ICAT-S",
+         "Need for Cognition" = "NFC",
+         "Protestant Ethic" = "PE",
+         "Personal Need for Structure" = "PNS",
+         "Rosenberg Self-Esteem" = "RSE",
+         "Ring-Wing Authoritarianism" = "RWA",
+         "Social Dominance Orientation" = "SDO",
+         "Self-Monitoring" = "SM",
+         "Spheres of Control - Interpersonal Control" = "SOC-IC",
+         "Spheres of Control - Personal Efficiacy" = "SOC-PE")
+
+shiny_app_data_1 <- temp_1 %>%
+  left_join(temp_2, by = "rowname") %>%
+  select(-rowname, -individual_differences_measure, -individual_differences_sum_score) %>%
+  # recode factors to numerics to make them plotable. this lowers interpretability but maximises the bivariate relations that can be plotted.
+  mutate(`IAT block order` = recode(`IAT block order`, 
+                                    "a" = 1,
+                                    "b" = 2),
+         `Political identity` = recode(as.character(`Political identity`), 
+                                       "Strongly Conservative"   = 1,
+                                       "Moderately Conservative" = 2,
+                                       "Slightly Conservative"   = 3,
+                                       "Neutral (Moderate)"      = 4,
+                                       "Slightly Liberal"        = 5,
+                                       "Moderately Liberal"      = 6,
+                                       "Strongly Liberal"        = 7),
+         Religiosity = recode(as.character(Religiosity), 
+                              "Not at all religious"   = 1,
+                              "Somewhat religious"     = 2,
+                              "Moderately religious"   = 3,
+                              "Very religious"         = 4),
+         Income = recode(as.character(Income), 
+                         "< $25,000"        = 1,
+                         "25,000 - 49,999"  = 2,
+                         "50,000 - 74,999"  = 3,
+                         "75,000 - 149,999" = 4,
+                         "> 150,000"        = 5),
+         `English fluency` = recode(as.character(`English fluency`), 
+                         "Not fluent"        = 1,
+                         "English knowledgable"  = 2,
+                         "English fluent - speak/read infrequently"  = 3,
+                         "English fluent - speak/read it regularly" = 4,
+                         "English is my primary language"        = 5),
+         Education = recode(as.character(Education), 
+                            "Not a high school graduate"             = 1,
+                            "High school graduate"                   = 2,
+                            "Some college or associate’s degree"     = 3,
+                            "Bachelor’s degree"                      = 4,
+                            "Graduate degree or graduate education"  = 5),
+         Sex = recode(as.character(Sex), 
+                            "f" = 1,
+                            "m" = 2),
+         `Implicit/explicit task order` = recode(as.character(`Implicit/explicit task order`), 
+                            "explicit first" = 1,
+                            "implicit first" = 2))
+
+
+save(shiny_app_data_1, file = "shiny_app_data_1.RData")
+
+```
+
+# Subset 2
+
+```{r}
+
+# self report data
+reshaped_data <- attitudes_2.0_subset_exploratory %>%
+  filter(!is.na(domain)) %>%
+  select(domain,
+         prefer,
+         gut_diff,
+         gut_mean,
+         actual_diff,
+         actual_mean,
+         evaluation_diff,
+         evaluation_mean,
+         positive_only_diff,
+         positive_only_mean,
+         negative_only_diff,
+         negative_only_mean,
+         
+         certainty_diff,
+         certainty_mean,
+         importance_diff,
+         importance_mean,
+         polarity_diff,
+         polarity_mean,
+         stability_diff,
+         stability_mean,
+         think_diff,
+         think_mean,
+         
+         identity_diff,
+         identity_mean,
+         self_concept_diff,
+         self_concept_mean,
+         personal_values_diff,
+         personal_values_mean,
+         
+         others_prefer,
+         ##others_diff,
+         ##others_mean,
+         others_pressure_diff,
+         others_pressure_mean,
+         cultural_attitudes_diff,
+         cultural_attitudes_mean,
+         cultural_pressure_diff,
+         cultural_pressure_mean) %>%
+  gather(metric, score, c("prefer",
+                           "gut_diff",
+                           "gut_mean",
+                           "actual_diff",
+                           "actual_mean",
+                           "evaluation_diff",
+                           "evaluation_mean",
+                           "positive_only_diff",
+                           "positive_only_mean",
+                           "negative_only_diff",
+                           "negative_only_mean",
+                           
+                           "certainty_diff",
+                           "certainty_mean",
+                           "importance_diff",
+                           "importance_mean",
+                           "polarity_diff",
+                           "polarity_mean",
+                           "stability_diff",
+                           "stability_mean",
+                           "think_diff",
+                           "think_mean",
+                           
+                           "identity_diff",
+                           "identity_mean",
+                           "self_concept_diff",
+                           "self_concept_mean",
+                           "personal_values_diff",
+                           "personal_values_mean",
+                           
+                           "others_prefer",
+                           ##others_diff,
+                           ##others_mean,
+                           "others_pressure_diff",
+                           "others_pressure_mean",
+                           "cultural_attitudes_diff",
+                           "cultural_attitudes_mean",
+                           "cultural_pressure_diff",
+                           "cultural_pressure_mean"))
+
+# iat data
+iat_data <- attitudes_2.0_subset_exploratory %>%
+  filter(!is.na(D) & complete_iat_data == TRUE & exclude_iat_stricter == FALSE) %>%
+  select(domain, D, iat_type) %>%
+  rename(score = D,
+         metric = iat_type) %>%
+  mutate(metric = recode(metric,
+                         "Evaluation" = "Evaluation IAT",
+                         "Identity" = "Identity IAT"))
+
+# combine
+combined_data <- rbind(reshaped_data, iat_data) %>%
+  na.omit()
+
+# summarize
+summary_of_attitudes_data <- combined_data %>%
+  group_by(domain, metric) %>%
+  summarise(n = n(), 
+            M = round(mean(score), 3),
+            SE = round(std.error(score), 3),
+            SD = round(sd(score), 3)) %>%
+  ungroup() %>%
+  mutate(Z = round(M/SD, 3)) %>%
+  gather(statistic, score, c("n", "M", "SE", "SD", "Z"))
+
+shiny_app_data_2 <- summary_of_attitudes_data
+
+save(shiny_app_data_2, file = "shiny_app_data_2.RData")
+
+```
