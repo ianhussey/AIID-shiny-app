@@ -11,7 +11,7 @@ library(patchwork)
 
 # options ----
 
-options(shiny.deprecation.messages = FALSE)
+#options(shiny.deprecation.messages = FALSE)
 
 
 # get data ----
@@ -50,7 +50,7 @@ ui <-
                         h3("Usage"),
                         
                         # text 
-                        p("The 'Attitudes between domains' tab allows comparions between domains along different implicit and explicit attitude features. The 'Bivariate relations' tab displays the available sample size for different bivariate comparisons, and has the option to plot bivariate linear regressions. Please note that there are a greater number variables are available in the dataset than in this app.")
+                        p("The 'Attitudes between domains' tab allows comparions between domains along different implicit and explicit attitude features. The 'Bivariate relations' tab displays the available sample size for different bivariate comparisons, and has the option to plot bivariate linear regressions. Please note that there are a greater number variables are available in the dataset than in this app. Code for this shiny app ", a(href = "https://github.com/ianhussey/AIID-shiny-app", "here."))
                         
                       )
              ),
