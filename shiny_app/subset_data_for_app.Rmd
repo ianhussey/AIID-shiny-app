@@ -39,7 +39,7 @@ options(scipen = 999)
 options(knitr.table.format = "html") # necessary configuration of tables
 
 # get data - not available in this repository
-load("../../AIID-study/data/subsets/attitudes_2.0_subset_exploratory.RData")
+load("../../AIID-study/data/subsets/AIID_subset_exploratory.RData")
 
 ```
 
@@ -48,7 +48,7 @@ load("../../AIID-study/data/subsets/attitudes_2.0_subset_exploratory.RData")
 ```{r}
 
 # trim
-temp_1 <- attitudes_2.0_subset_exploratory %>%
+temp_1 <- AIID_subset_exploratory %>%
   select(datetime_ymdhms, 
          domain, 
          task_order, 
@@ -237,7 +237,7 @@ save(shiny_app_data_1, file = "shiny_app_data_1.RData")
 ```{r}
 
 # self report data
-reshaped_data <- attitudes_2.0_subset_exploratory %>%
+reshaped_data <- AIID_subset_exploratory %>%
   filter(!is.na(domain)) %>%
   select(domain,
          prefer,
@@ -320,7 +320,7 @@ reshaped_data <- attitudes_2.0_subset_exploratory %>%
                            "cultural_pressure_mean"))
 
 # iat data
-iat_data <- attitudes_2.0_subset_exploratory %>%
+iat_data <- AIID_subset_exploratory %>%
   filter(!is.na(D) & complete_iat_data == TRUE & exclude_iat_stricter == FALSE) %>%
   select(domain, D, iat_type) %>%
   rename(score = D,

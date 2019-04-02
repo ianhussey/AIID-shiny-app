@@ -1,0 +1,13 @@
+name: shiny_app
+title: shiny_app
+username:
+account: mmmdata
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 834117
+bundleId: 1982796
+url: https://mmmdata.shinyapps.io/shiny_app/
+when: 1554245774.33264
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: subset_data_for_app.html|subset_data_for_app.Rmd
